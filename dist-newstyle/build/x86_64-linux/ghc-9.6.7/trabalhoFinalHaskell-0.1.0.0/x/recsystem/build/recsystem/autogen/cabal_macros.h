@@ -60,6 +60,16 @@
   (major1) == 2 && (major2) <  0 || \
   (major1) == 2 && (major2) == 0 && (minor) <= 2)
 #endif /* MIN_VERSION_text */
+/* package wai-cors-0.2.7 */
+#ifndef VERSION_wai_cors
+#define VERSION_wai_cors "0.2.7"
+#endif /* VERSION_wai_cors */
+#ifndef MIN_VERSION_wai_cors
+#define MIN_VERSION_wai_cors(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  2 || \
+  (major1) == 0 && (major2) == 2 && (minor) <= 7)
+#endif /* MIN_VERSION_wai_cors */
 
 /* tool gcc-13 */
 #ifndef TOOL_VERSION_gcc
