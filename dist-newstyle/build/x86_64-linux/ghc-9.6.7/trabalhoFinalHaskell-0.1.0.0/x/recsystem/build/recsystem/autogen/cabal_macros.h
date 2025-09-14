@@ -30,6 +30,16 @@
   (major1) == 4 && (major2) <  18 || \
   (major1) == 4 && (major2) == 18 && (minor) <= 3)
 #endif /* MIN_VERSION_base */
+/* package req-3.13.4 */
+#ifndef VERSION_req
+#define VERSION_req "3.13.4"
+#endif /* VERSION_req */
+#ifndef MIN_VERSION_req
+#define MIN_VERSION_req(major1,major2,minor) (\
+  (major1) <  3 || \
+  (major1) == 3 && (major2) <  13 || \
+  (major1) == 3 && (major2) == 13 && (minor) <= 4)
+#endif /* MIN_VERSION_req */
 /* package scotty-0.22 */
 #ifndef VERSION_scotty
 #define VERSION_scotty "0.22"

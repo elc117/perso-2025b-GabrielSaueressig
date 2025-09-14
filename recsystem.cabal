@@ -71,6 +71,7 @@ executable recsystem
                     , scotty
                     , aeson
                     , text
+                    , req
 
     -- Directories containing source files.
     hs-source-dirs:   app
