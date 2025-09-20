@@ -73,6 +73,7 @@ executable recsystem
                     , text
                     , req
                     , wai-cors  
+                    , random
 
     -- Directories containing source files.
     hs-source-dirs:   app

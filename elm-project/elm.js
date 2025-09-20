@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.E === region.X.E)
+	if (region.S.E === region.Y.E)
 	{
-		return 'on line ' + region.R.E;
+		return 'on line ' + region.S.E;
 	}
-	return 'on lines ' + region.R.E + ' through ' + region.X.E;
+	return 'on lines ' + region.S.E + ' through ' + region.Y.E;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
-		impl.aX,
-		impl.aV,
+		impl.aO,
+		impl.a$,
+		impl.aZ,
 		function() { return function() {} }
 	);
 });
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		r: func(record.r),
-		S: record.S,
-		P: record.P
+		T: record.T,
+		Q: record.Q
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.r;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
-		impl.aX,
-		impl.aV,
+		impl.aO,
+		impl.a$,
+		impl.aZ,
 		function(sendToApp, initialModel) {
-			var view = impl.aY;
+			var view = impl.a0;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
-		impl.aX,
-		impl.aV,
+		impl.aO,
+		impl.a$,
+		impl.aZ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
-			var view = impl.aY;
+			var divertHrefToApp = impl.R && impl.R(sendToApp)
+			var view = impl.a0;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aD);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aH);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.H) && (_VirtualDom_doc.title = title = doc.H);
+				(title !== doc.t) && (_VirtualDom_doc.title = title = doc.t);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aN;
-	var onUrlRequest = impl.aO;
+	var onUrlChange = impl.aR;
+	var onUrlRequest = impl.aS;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		Q: function(sendToApp)
+		R: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.al === next.al
-							&& curr.ac === next.ac
-							&& curr.ai.a === next.ai.a
+							&& curr.an === next.an
+							&& curr.ae === next.ae
+							&& curr.ak.a === next.ak.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aK: function(flags)
+		aO: function(flags)
 		{
-			return A3(impl.aK, flags, _Browser_getUrl(), key);
+			return A3(impl.aO, flags, _Browser_getUrl(), key);
 		},
-		aY: impl.aY,
-		aX: impl.aX,
-		aV: impl.aV
+		a0: impl.a0,
+		a$: impl.a$,
+		aZ: impl.aZ
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aI: 'hidden', aE: 'visibilitychange' }
+		? { aM: 'hidden', aI: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aI: 'mozHidden', aE: 'mozvisibilitychange' }
+		? { aM: 'mozHidden', aI: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aI: 'msHidden', aE: 'msvisibilitychange' }
+		? { aM: 'msHidden', aI: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aI: 'webkitHidden', aE: 'webkitvisibilitychange' }
-		: { aI: 'hidden', aE: 'visibilitychange' };
+		? { aM: 'webkitHidden', aI: 'webkitvisibilitychange' }
+		: { aM: 'hidden', aI: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ar: _Browser_getScene(),
-		ax: {
-			az: _Browser_window.pageXOffset,
-			aA: _Browser_window.pageYOffset,
-			ay: _Browser_doc.documentElement.clientWidth,
-			ab: _Browser_doc.documentElement.clientHeight
+		au: _Browser_getScene(),
+		aA: {
+			aD: _Browser_window.pageXOffset,
+			aE: _Browser_window.pageYOffset,
+			aC: _Browser_doc.documentElement.clientWidth,
+			ad: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		ay: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aC: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ad: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ar: {
-				ay: node.scrollWidth,
-				ab: node.scrollHeight
+			au: {
+				aC: node.scrollWidth,
+				ad: node.scrollHeight
 			},
-			ax: {
-				az: node.scrollLeft,
-				aA: node.scrollTop,
-				ay: node.clientWidth,
-				ab: node.clientHeight
+			aA: {
+				aD: node.scrollLeft,
+				aE: node.scrollTop,
+				aC: node.clientWidth,
+				ad: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ar: _Browser_getScene(),
-			ax: {
-				az: x,
-				aA: y,
-				ay: _Browser_doc.documentElement.clientWidth,
-				ab: _Browser_doc.documentElement.clientHeight
+			au: _Browser_getScene(),
+			aA: {
+				aD: x,
+				aE: y,
+				aC: _Browser_doc.documentElement.clientWidth,
+				ad: _Browser_doc.documentElement.clientHeight
 			},
-			aG: {
-				az: x + rect.left,
-				aA: y + rect.top,
-				ay: rect.width,
-				ab: rect.height
+			aK: {
+				aD: x + rect.left,
+				aE: y + rect.top,
+				aC: rect.width,
+				ad: rect.height
 			}
 		};
 	});
@@ -4380,25 +4380,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.Z.a(response)));
+			callback(toTask(request._.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.Z.b, xhr)); });
-		$elm$core$Maybe$isJust(request.av) && _Http_track(router, xhr, request.av.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request._.b, xhr)); });
+		$elm$core$Maybe$isJust(request.ay) && _Http_track(router, xhr, request.ay.a);
 
 		try {
-			xhr.open(request.aL, request.aw, true);
+			xhr.open(request.aP, request.az, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.aw));
+			return done($elm$http$Http$BadUrl_(request.az));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.aD.a && xhr.setRequestHeader('Content-Type', request.aD.a);
-		xhr.send(request.aD.b);
+		request.aH.a && xhr.setRequestHeader('Content-Type', request.aH.a);
+		xhr.send(request.aH.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4409,13 +4409,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.aa; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.ac; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.aW.a || 0;
-	xhr.responseType = request.Z.d;
-	xhr.withCredentials = request.aB;
+	xhr.timeout = request.a_.a || 0;
+	xhr.responseType = request._.d;
+	xhr.withCredentials = request.aF;
 }
 
 
@@ -4436,10 +4436,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		aw: xhr.responseURL,
-		aT: xhr.status,
-		aU: xhr.statusText,
-		aa: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		az: xhr.responseURL,
+		aX: xhr.status,
+		aY: xhr.statusText,
+		ac: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4534,15 +4534,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			aS: event.loaded,
-			as: event.total
+			aW: event.loaded,
+			av: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			aQ: event.loaded,
-			as: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			aU: event.loaded,
+			av: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }var $elm$core$Basics$EQ = 1;
@@ -5049,7 +5049,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {_: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
+		return {aa: fragment, ae: host, ai: path, ak: port_, an: protocol, ao: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5334,7 +5334,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Frontend$init = function (_v0) {
 	return _Utils_Tuple2(
-		{q: $elm$core$Dict$empty, j: _List_Nil, z: true, A: _List_Nil, L: '', n: ''},
+		{q: $elm$core$Dict$empty, k: _List_Nil, A: true, F: _List_Nil, M: _List_Nil, N: '', j: ''},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5342,7 +5342,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Frontend$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$none;
 };
-var $author$project$Frontend$AllSent = function (a) {
+var $author$project$Frontend$GotRecommended = function (a) {
 	return {$: 5, a: a};
 };
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
@@ -5935,7 +5935,7 @@ var $elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.aT));
+					$elm$http$Http$BadStatus(metadata.aX));
 			default:
 				var body = response.b;
 				return A2(
@@ -5957,7 +5957,6 @@ var $elm$http$Http$expectJson = F2(
 						A2($elm$json$Json$Decode$decodeString, decoder, string));
 				}));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -6042,7 +6041,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {ao: reqs, at: subs};
+		return {ar: reqs, aw: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6086,7 +6085,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.av;
+							var _v4 = req.ay;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6116,7 +6115,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.ao));
+			A3($elm$http$Http$updateReqs, router, cmds, state.ar));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6159,7 +6158,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.at)));
+					state.aw)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6173,14 +6172,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					aB: r.aB,
-					aD: r.aD,
-					Z: A2(_Http_mapExpect, func, r.Z),
-					aa: r.aa,
-					aL: r.aL,
-					aW: r.aW,
-					av: r.av,
-					aw: r.aw
+					aF: r.aF,
+					aH: r.aH,
+					_: A2(_Http_mapExpect, func, r._),
+					ac: r.ac,
+					aP: r.aP,
+					a_: r.a_,
+					ay: r.ay,
+					az: r.az
 				});
 		}
 	});
@@ -6203,27 +6202,46 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{aB: false, aD: r.aD, Z: r.Z, aa: r.aa, aL: r.aL, aW: r.aW, av: r.av, aw: r.aw}));
+			{aF: false, aH: r.aH, _: r._, ac: r.ac, aP: r.aP, a_: r.a_, ay: r.ay, az: r.az}));
 };
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
-		{aD: r.aD, Z: r.Z, aa: _List_Nil, aL: 'POST', aW: $elm$core$Maybe$Nothing, av: $elm$core$Maybe$Nothing, aw: r.aw});
+		{aH: r.aH, _: r._, ac: _List_Nil, aP: 'POST', a_: $elm$core$Maybe$Nothing, ay: $elm$core$Maybe$Nothing, az: r.az});
 };
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$Frontend$RecommendedMovie = F5(
+	function (title, releaseDate, voteAverage, genres, poster) {
+		return {ab: genres, G: poster, ap: releaseDate, t: title, aB: voteAverage};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $elm$json$Json$Decode$map5 = _Json_map5;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Frontend$recommendedMovieDecoder = A6(
+	$elm$json$Json$Decode$map5,
+	$author$project$Frontend$RecommendedMovie,
+	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'releaseDate', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'voteAverage', $elm$json$Json$Decode$float),
+	A2(
+		$elm$json$Json$Decode$field,
+		'genres',
+		$elm$json$Json$Decode$list($elm$json$Json$Decode$string)),
+	A2($elm$json$Json$Decode$field, 'poster', $elm$json$Json$Decode$string));
+var $author$project$Frontend$recommendedDecoder = $elm$json$Json$Decode$list($author$project$Frontend$recommendedMovieDecoder);
 var $author$project$Frontend$GotMovies = function (a) {
 	return {$: 2, a: a};
 };
 var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
-		{aD: $elm$http$Http$emptyBody, Z: r.Z, aa: _List_Nil, aL: 'GET', aW: $elm$core$Maybe$Nothing, av: $elm$core$Maybe$Nothing, aw: r.aw});
+		{aH: $elm$http$Http$emptyBody, _: r._, ac: _List_Nil, aP: 'GET', a_: $elm$core$Maybe$Nothing, ay: $elm$core$Maybe$Nothing, az: r.az});
 };
-var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Frontend$Movie = F4(
 	function (title, year, imdbID, poster) {
-		return {K: imdbID, O: poster, H: title, T: year};
+		return {L: imdbID, G: poster, t: title, U: year};
 	});
 var $elm$json$Json$Decode$map4 = _Json_map4;
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Frontend$movieDecoder = A5(
 	$elm$json$Json$Decode$map4,
 	$author$project$Frontend$Movie,
@@ -6238,8 +6256,8 @@ var $author$project$Frontend$moviesDecoder = A2(
 var $author$project$Frontend$searchMovies = function (s) {
 	return $elm$http$Http$get(
 		{
-			Z: A2($elm$http$Http$expectJson, $author$project$Frontend$GotMovies, $author$project$Frontend$moviesDecoder),
-			aw: 'http://localhost:3000/filmeGeral?title=' + (s + '&option=s')
+			_: A2($elm$http$Http$expectJson, $author$project$Frontend$GotMovies, $author$project$Frontend$moviesDecoder),
+			az: 'http://localhost:3000/filmeGeral?title=' + (s + '&option=s')
 		});
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6266,26 +6284,26 @@ var $author$project$Frontend$update = F2(
 		switch (msg.$) {
 			case 0:
 				var g = msg.a;
-				var already = A2($elm$core$List$member, g, model.j);
+				var already = A2($elm$core$List$member, g, model.k);
 				var newList = already ? A2(
 					$elm$core$List$filter,
 					$elm$core$Basics$neq(g),
-					model.j) : (($elm$core$List$length(model.j) < 3) ? A2($elm$core$List$cons, g, model.j) : model.j);
+					model.k) : (($elm$core$List$length(model.k) < 3) ? A2($elm$core$List$cons, g, model.k) : model.k);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{j: newList}),
+						{k: newList}),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				var s = msg.a;
 				return $elm$core$String$isEmpty(s) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{A: _List_Nil, L: s, n: ''}),
+						{F: _List_Nil, N: s, j: ''}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{L: s, n: 'Buscando...'}),
+						{N: s, j: 'Buscando...'}),
 					$author$project$Frontend$searchMovies(s));
 			case 2:
 				if (!msg.a.$) {
@@ -6293,19 +6311,19 @@ var $author$project$Frontend$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{A: ms, n: ''}),
+							{F: ms, j: ''}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{n: 'Erro ao buscar filmes!'}),
+							{j: 'Erro ao buscar filmes!'}),
 						$elm$core$Platform$Cmd$none);
 				}
 			case 3:
 				var movie = msg.a;
-				var isFav = A2($elm$core$Dict$member, movie.K, model.q);
-				var newFavs = isFav ? A2($elm$core$Dict$remove, movie.K, model.q) : A3($elm$core$Dict$insert, movie.K, movie, model.q);
+				var isFav = A2($elm$core$Dict$member, movie.L, model.q);
+				var newFavs = isFav ? A2($elm$core$Dict$remove, movie.L, model.q) : A3($elm$core$Dict$insert, movie.L, movie, model.q);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -6313,7 +6331,7 @@ var $author$project$Frontend$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				var favIds = $elm$core$Dict$keys(model.q);
-				var englishGenres = A2($elm$core$List$map, $author$project$Frontend$translateGenre, model.j);
+				var englishGenres = A2($elm$core$List$map, $author$project$Frontend$translateGenre, model.k);
 				var body = $elm$json$Json$Encode$object(
 					_List_fromArray(
 						[
@@ -6327,42 +6345,56 @@ var $author$project$Frontend$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{z: false, n: 'Enviando...'}),
+						{A: false, j: 'Enviando...'}),
 					$elm$http$Http$post(
 						{
-							aD: $elm$http$Http$jsonBody(body),
-							Z: A2(
-								$elm$http$Http$expectJson,
-								$author$project$Frontend$AllSent,
-								A2($elm$json$Json$Decode$field, 'status', $elm$json$Json$Decode$string)),
-							aw: 'http://localhost:3000/recommend/genero'
+							aH: $elm$http$Http$jsonBody(body),
+							_: A2($elm$http$Http$expectJson, $author$project$Frontend$GotRecommended, $author$project$Frontend$recommendedDecoder),
+							az: 'http://localhost:3000/recommend/genero/recentes'
 						}));
 			case 5:
 				if (!msg.a.$) {
-					var s = msg.a.a;
+					var movies = msg.a.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{A: _List_Nil, n: 'Enviado com sucesso: ' + s}),
+							{M: movies, j: 'Recomendações carregadas'}),
 						$elm$core$Platform$Cmd$none);
 				} else {
+					var err = msg.a.a;
+					var errorMsg = function () {
+						switch (err.$) {
+							case 0:
+								return 'URL inválida';
+							case 1:
+								return 'Timeout';
+							case 2:
+								return 'Erro de rede';
+							case 3:
+								var code = err.a;
+								return 'Erro ' + $elm$core$String$fromInt(code);
+							default:
+								var errorBody = err.a;
+								return 'Erro de decodificação: ' + errorBody;
+						}
+					}();
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{n: 'Erro ao enviar dados!'}),
+							{j: 'Erro ao carregar recomendações: ' + errorMsg}),
 						$elm$core$Platform$Cmd$none);
 				}
 			case 6:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{z: false}),
+						{A: false}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{z: true}),
+						{A: true}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -6448,6 +6480,7 @@ var $author$project$Frontend$genreCheckbox = F2(
 	});
 var $author$project$Frontend$genres = _List_fromArray(
 	['Ação', 'Drama', 'Comédia', 'Terror', 'Romance', 'Sci-Fi']);
+var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -6514,8 +6547,8 @@ var $author$project$Frontend$viewFavorite = function (movie) {
 				$elm$html$Html$img,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$src(movie.O),
-						$elm$html$Html$Attributes$alt(movie.H),
+						$elm$html$Html$Attributes$src(movie.G),
+						$elm$html$Html$Attributes$alt(movie.t),
 						$elm$html$Html$Attributes$class('w-24 h-32 object-cover rounded mb-2')
 					]),
 				_List_Nil),
@@ -6527,7 +6560,7 @@ var $author$project$Frontend$viewFavorite = function (movie) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(movie.H)
+						$elm$html$Html$text(movie.t)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -6537,7 +6570,7 @@ var $author$project$Frontend$viewFavorite = function (movie) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('(' + (movie.T + ')'))
+						$elm$html$Html$text('(' + (movie.U + ')'))
 					])),
 				A2(
 				$elm$html$Html$button,
@@ -6566,8 +6599,8 @@ var $author$project$Frontend$viewMovie = function (movie) {
 				$elm$html$Html$img,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$src(movie.O),
-						$elm$html$Html$Attributes$alt(movie.H),
+						$elm$html$Html$Attributes$src(movie.G),
+						$elm$html$Html$Attributes$alt(movie.t),
 						$elm$html$Html$Attributes$class('w-24 h-32 object-cover rounded mb-2')
 					]),
 				_List_Nil),
@@ -6579,7 +6612,7 @@ var $author$project$Frontend$viewMovie = function (movie) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(movie.H)
+						$elm$html$Html$text(movie.t)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -6589,7 +6622,7 @@ var $author$project$Frontend$viewMovie = function (movie) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('(' + (movie.T + ')'))
+						$elm$html$Html$text('(' + (movie.U + ')'))
 					])),
 				A2(
 				$elm$html$Html$button,
@@ -6602,6 +6635,69 @@ var $author$project$Frontend$viewMovie = function (movie) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Favoritar')
+					]))
+			]));
+};
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $author$project$Frontend$viewRecommendedMovie = function (movie) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('border rounded shadow p-2 flex flex-col items-center')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$img,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$src(movie.G),
+						$elm$html$Html$Attributes$alt(movie.t),
+						$elm$html$Html$Attributes$class('w-24 h-32 object-cover rounded mb-2')
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('text-center text-sm font-bold')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(movie.t)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('text-xs text-gray-600 mb-1')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(movie.ap)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('text-xs text-blue-600 mb-1')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'⭐ ' + $elm$core$String$fromFloat(movie.aB))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('text-xs text-green-600')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						A2($elm$core$String$join, ', ', movie.ab))
 					]))
 			]));
 };
@@ -6625,7 +6721,7 @@ var $author$project$Frontend$view = function (model) {
 					[
 						$elm$html$Html$text('Abrir Busca')
 					])),
-				model.z ? A2(
+				model.A ? A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
@@ -6670,7 +6766,7 @@ var $author$project$Frontend$view = function (model) {
 									]),
 								A2(
 									$elm$core$List$map,
-									$author$project$Frontend$genreCheckbox(model.j),
+									$author$project$Frontend$genreCheckbox(model.k),
 									$author$project$Frontend$genres)),
 								A2(
 								$elm$html$Html$input,
@@ -6688,7 +6784,7 @@ var $author$project$Frontend$view = function (model) {
 									[
 										$elm$html$Html$Attributes$class('mt-1 h-80 overflow-y-auto')
 									]),
-								A2($elm$core$List$map, $author$project$Frontend$viewMovie, model.A)),
+								A2($elm$core$List$map, $author$project$Frontend$viewMovie, model.F)),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
@@ -6702,11 +6798,21 @@ var $author$project$Frontend$view = function (model) {
 									]))
 							]))
 					])) : $elm$html$Html$text(''),
+				(!$elm$core$String$isEmpty(model.j)) ? A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mb-4 p-3 bg-blue-100 border border-blue-300 rounded')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(model.j)
+					])) : $elm$html$Html$text(''),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('mb-4 mt-4')
+						$elm$html$Html$Attributes$class('mb-4 mt-4 font-bold text-lg')
 					]),
 				_List_fromArray(
 					[
@@ -6721,10 +6827,27 @@ var $author$project$Frontend$view = function (model) {
 				A2(
 					$elm$core$List$map,
 					$author$project$Frontend$viewFavorite,
-					$elm$core$Dict$values(model.q)))
+					$elm$core$Dict$values(model.q))),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mb-4 mt-4 font-bold text-lg')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Recomendações Baseados nos Gêneros que você gosta:')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('grid grid-cols-4 gap-4 mt-2')
+					]),
+				A2($elm$core$List$map, $author$project$Frontend$viewRecommendedMovie, model.M))
 			]));
 };
 var $author$project$Frontend$main = $elm$browser$Browser$element(
-	{aK: $author$project$Frontend$init, aV: $author$project$Frontend$subscriptions, aX: $author$project$Frontend$update, aY: $author$project$Frontend$view});
+	{aO: $author$project$Frontend$init, aZ: $author$project$Frontend$subscriptions, a$: $author$project$Frontend$update, a0: $author$project$Frontend$view});
 _Platform_export({'Frontend':{'init':$author$project$Frontend$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

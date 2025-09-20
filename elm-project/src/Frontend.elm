@@ -20,12 +20,21 @@ type alias Movie =
     , poster : String
     }
 
+-- Novo tipo para filmes recomendados (TMDB)
+type alias RecommendedMovie =
+    { title : String
+    , releaseDate : String  
+    , voteAverage : Float
+    , genres : List String
+    , poster : String  -- Adicionado campo poster
+    }
 
 type alias Model =
     { genresSelected : List String
     , searchTitle : String
     , movies : List Movie
     , favorites : Dict.Dict String Movie
+    , recommended : List RecommendedMovie  -- Mudança aqui
     , status : String
     , modalOpen : Bool
     }
@@ -37,8 +46,9 @@ init _ =
       , searchTitle = ""
       , movies = []
       , favorites = Dict.empty
+      , recommended = []
       , status = ""
-      , modalOpen = True -- abre ao iniciar
+      , modalOpen = True
       }
     , Cmd.none
     )
@@ -52,7 +62,7 @@ type Msg
     | GotMovies (Result Http.Error (List Movie))
     | ToggleFavorite Movie
     | SendAll
-    | AllSent (Result Http.Error String)
+    | GotRecommended (Result Http.Error (List RecommendedMovie))  -- Mudança aqui
     | CloseModal
     | OpenModal
 
@@ -72,6 +82,20 @@ moviesDecoder : Decoder (List Movie)
 moviesDecoder =
     Decode.field "Search" (Decode.list movieDecoder)
 
+-- Novo decoder para filmes recomendados (TMDB)
+recommendedMovieDecoder : Decoder RecommendedMovie
+recommendedMovieDecoder =
+    Decode.map5 RecommendedMovie
+        (Decode.field "title" Decode.string)
+        (Decode.field "releaseDate" Decode.string)
+        (Decode.field "voteAverage" Decode.float)
+        (Decode.field "genres" (Decode.list Decode.string))
+        (Decode.field "poster" Decode.string)
+
+recommendedDecoder : Decoder (List RecommendedMovie)
+recommendedDecoder =
+    Decode.list recommendedMovieDecoder
+
 
 -- GÊNEROS POSSÍVEIS
 
@@ -79,8 +103,6 @@ genres : List String
 genres =
     [ "Ação", "Drama", "Comédia", "Terror", "Romance", "Sci-Fi" ]
 
-
--- UPDATE
 
 translateGenre : String -> String
 translateGenre genre =
@@ -93,10 +115,13 @@ translateGenre genre =
         "Sci-Fi" -> "Sci-Fi"
         _ -> genre
 
+
+-- UPDATE
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        
+
         ToggleGenre g ->
             let
                 already = List.member g model.genresSelected
@@ -141,36 +166,40 @@ update msg model =
                 englishGenres = List.map translateGenre model.genresSelected
                 body =
                     Encode.object
-                        [ ( "Genre", Encode.list Encode.string englishGenres)
-                        , ( "favoritos", Encode.list Encode.string favIds )
+                        [ ( "generos", Encode.list Encode.string englishGenres )    -- Corrigido
+                        , ( "favoritos", Encode.list Encode.string favIds )        -- Corrigido
                         ]
             in
-            ( { model | status = "Enviando..." , modalOpen = False }
+            ( { model | status = "Enviando...", modalOpen = False }
             , Http.post
-                { url = "http://localhost:3000/recommend/genero"
+                { url = "http://localhost:3000/recommend/genero/recentes"
                 , body = Http.jsonBody body
-                , expect = Http.expectJson AllSent (Decode.field "status" Decode.string)
+                , expect = Http.expectJson GotRecommended recommendedDecoder
                 }
             )
 
-        AllSent (Ok s) ->
-            -- Após enviar, limpamos gêneros e filmes, mantendo favoritos
-            ( { model
-                |
-                  movies = []
-                , status = "Enviado com sucesso: " ++ s
-              }
-            , Cmd.none )
+        GotRecommended (Ok movies) ->
+            ( { model | recommended = movies, status = "Recomendações carregadas" }, Cmd.none )
 
-        AllSent (Err _) ->
-            ( { model | status = "Erro ao enviar dados!" }, Cmd.none )
+        GotRecommended (Err err) ->
+            let
+                errorMsg = case err of
+                    Http.BadUrl _ -> "URL inválida"
+                    Http.Timeout -> "Timeout"
+                    Http.NetworkError -> "Erro de rede"
+                    Http.BadStatus code -> "Erro " ++ String.fromInt code
+                    Http.BadBody errorBody -> "Erro de decodificação: " ++ errorBody
+            in
+            ( { model | status = "Erro ao carregar recomendações: " ++ errorMsg }, Cmd.none )
 
         CloseModal ->
             ( { model | modalOpen = False }, Cmd.none )
 
         OpenModal ->
-            ({model | modalOpen = True}, Cmd.none)
+            ({ model | modalOpen = True }, Cmd.none)
 
+
+-- COMUNICAÇÃO COM BACKEND
 
 searchMovies : String -> Cmd Msg
 searchMovies s =
@@ -179,7 +208,8 @@ searchMovies s =
         , expect = Http.expectJson GotMovies moviesDecoder
         }
 
---View
+
+-- VIEW
 
 view : Model -> Html Msg
 view model =
@@ -192,7 +222,7 @@ view model =
             [ text "Abrir Busca" ]
 
         , -- Modal de busca e gêneros
-         if model.modalOpen then
+          if model.modalOpen then
             div [ class "fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start pt-8 z-40" ]
                 [ div [ class "bg-white p-8 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto" ]
                     [ button [ onClick CloseModal, class " hover:text-gray text-black font-bold px-3 py-1 rounded shadow" ] [ text "X" ]
@@ -206,10 +236,21 @@ view model =
           else
             text ""
 
+        , -- Status
+          if not (String.isEmpty model.status) then
+            div [ class "mb-4 p-3 bg-blue-100 border border-blue-300 rounded" ]
+                [ text model.status ]
+          else
+            text ""
+
         , -- Lista de favoritos
-          div [ class "mb-4 mt-4" ] [ text "Favoritos:" ]
+          div [ class "mb-4 mt-4 font-bold text-lg" ] [ text "Favoritos:" ]
+        , div [ class "grid grid-cols-4 gap-4 mt-2" ] (List.map viewFavorite (Dict.values model.favorites))
+
+         -- Lista de recomendações
+        , div [ class "mb-4 mt-4 font-bold text-lg" ] [ text "Recomendações Baseados nos Gêneros que você gosta:" ]
         , div [ class "grid grid-cols-4 gap-4 mt-2" ]
-            (List.map viewFavorite (Dict.values model.favorites))
+            (List.map viewRecommendedMovie model.recommended)  -- Nova função
         ]
 
 
@@ -245,6 +286,17 @@ viewFavorite movie =
             [ text "Remover" ]
         ]
 
+-- Nova função para exibir filmes recomendados
+viewRecommendedMovie : RecommendedMovie -> Html Msg
+viewRecommendedMovie movie =
+    div [ class "border rounded shadow p-2 flex flex-col items-center" ]
+        [ -- Agora usando o poster real da OMDB
+          img [ src movie.poster, alt movie.title, class "w-24 h-32 object-cover rounded mb-2" ] []
+        , div [ class "text-center text-sm font-bold" ] [ text movie.title ]
+        , div [ class "text-xs text-gray-600 mb-1" ] [ text movie.releaseDate ]
+        , div [ class "text-xs text-blue-600 mb-1" ] [ text ("⭐ " ++ String.fromFloat movie.voteAverage) ]
+        , div [ class "text-xs text-green-600" ] [ text (String.join ", " movie.genres) ]
+        ]
 
 -- SUBSCRIPTIONS
 
