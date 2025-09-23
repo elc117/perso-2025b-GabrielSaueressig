@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.E === region.Y.E)
+	if (region.T.F === region.Y.F)
 	{
-		return 'on line ' + region.S.E;
+		return 'on line ' + region.T.F;
 	}
-	return 'on lines ' + region.S.E + ' through ' + region.Y.E;
+	return 'on lines ' + region.T.F + ' through ' + region.Y.F;
 }
 
 
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		r: func(record.r),
-		T: record.T,
-		Q: record.Q
+		U: record.U,
+		R: record.R
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.r;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3983,7 +3983,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.a$,
 		impl.aZ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.R && impl.R(sendToApp)
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
 			var view = impl.a0;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4058,7 +4058,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		R: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.an === next.an
+							&& curr.ao === next.ao
 							&& curr.ae === next.ae
-							&& curr.ak.a === next.ak.a
+							&& curr.al.a === next.al.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4249,9 +4249,9 @@ function _Browser_getViewport()
 	return {
 		au: _Browser_getScene(),
 		aA: {
-			aD: _Browser_window.pageXOffset,
-			aE: _Browser_window.pageYOffset,
-			aC: _Browser_doc.documentElement.clientWidth,
+			aC: _Browser_window.pageXOffset,
+			aD: _Browser_window.pageYOffset,
+			aB: _Browser_doc.documentElement.clientWidth,
 			ad: _Browser_doc.documentElement.clientHeight
 		}
 	};
@@ -4262,7 +4262,7 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aC: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aB: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
 		ad: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
@@ -4287,13 +4287,13 @@ function _Browser_getViewportOf(id)
 	{
 		return {
 			au: {
-				aC: node.scrollWidth,
+				aB: node.scrollWidth,
 				ad: node.scrollHeight
 			},
 			aA: {
-				aD: node.scrollLeft,
-				aE: node.scrollTop,
-				aC: node.clientWidth,
+				aC: node.scrollLeft,
+				aD: node.scrollTop,
+				aB: node.clientWidth,
 				ad: node.clientHeight
 			}
 		};
@@ -4326,15 +4326,15 @@ function _Browser_getElement(id)
 		return {
 			au: _Browser_getScene(),
 			aA: {
-				aD: x,
-				aE: y,
-				aC: _Browser_doc.documentElement.clientWidth,
+				aC: x,
+				aD: y,
+				aB: _Browser_doc.documentElement.clientWidth,
 				ad: _Browser_doc.documentElement.clientHeight
 			},
 			aK: {
-				aD: x + rect.left,
-				aE: y + rect.top,
-				aC: rect.width,
+				aC: x + rect.left,
+				aD: y + rect.top,
+				aB: rect.width,
 				ad: rect.height
 			}
 		};
@@ -5049,7 +5049,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aa: fragment, ae: host, ai: path, ak: port_, an: protocol, ao: query};
+		return {aa: fragment, ae: host, aj: path, al: port_, ao: protocol, ap: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5334,7 +5334,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Frontend$init = function (_v0) {
 	return _Utils_Tuple2(
-		{q: $elm$core$Dict$empty, k: _List_Nil, A: true, F: _List_Nil, M: _List_Nil, N: '', j: ''},
+		{i: $elm$core$Dict$empty, j: _List_Nil, A: true, B: _List_Nil, G: _List_Nil, N: '', l: ''},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5968,6 +5968,15 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
+var $author$project$Frontend$getMovieId = function (movie) {
+	var _v0 = movie.af;
+	if (!_v0.$) {
+		var id = _v0.a;
+		return id;
+	} else {
+		return movie.t + ('_' + movie.H);
+	}
+};
 var $elm$http$Http$jsonBody = function (value) {
 	return A2(
 		_Http_pair,
@@ -6022,6 +6031,38 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$Frontend$Movie = F6(
+	function (title, releaseDate, voteAverage, genres, poster, imdbId) {
+		return {ab: genres, af: imdbId, M: poster, H: releaseDate, t: title, O: voteAverage};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $elm$json$Json$Decode$map6 = _Json_map6;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$maybe = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
+				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
+			]));
+};
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Frontend$movieDecoder = A7(
+	$elm$json$Json$Decode$map6,
+	$author$project$Frontend$Movie,
+	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'releaseDate', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'voteAverage', $elm$json$Json$Decode$float),
+	A2(
+		$elm$json$Json$Decode$field,
+		'genres',
+		$elm$json$Json$Decode$list($elm$json$Json$Decode$string)),
+	A2($elm$json$Json$Decode$field, 'poster', $elm$json$Json$Decode$string),
+	$elm$json$Json$Decode$maybe(
+		A2($elm$json$Json$Decode$field, 'imdbId', $elm$json$Json$Decode$string)));
+var $author$project$Frontend$moviesDecoder = $elm$json$Json$Decode$list($author$project$Frontend$movieDecoder);
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -6208,27 +6249,6 @@ var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
 		{aH: r.aH, _: r._, ac: _List_Nil, aP: 'POST', a_: $elm$core$Maybe$Nothing, ay: $elm$core$Maybe$Nothing, az: r.az});
 };
-var $elm$json$Json$Decode$list = _Json_decodeList;
-var $author$project$Frontend$RecommendedMovie = F5(
-	function (title, releaseDate, voteAverage, genres, poster) {
-		return {ab: genres, G: poster, ap: releaseDate, t: title, aB: voteAverage};
-	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $elm$json$Json$Decode$map5 = _Json_map5;
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Frontend$recommendedMovieDecoder = A6(
-	$elm$json$Json$Decode$map5,
-	$author$project$Frontend$RecommendedMovie,
-	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'releaseDate', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'voteAverage', $elm$json$Json$Decode$float),
-	A2(
-		$elm$json$Json$Decode$field,
-		'genres',
-		$elm$json$Json$Decode$list($elm$json$Json$Decode$string)),
-	A2($elm$json$Json$Decode$field, 'poster', $elm$json$Json$Decode$string));
-var $author$project$Frontend$recommendedDecoder = $elm$json$Json$Decode$list($author$project$Frontend$recommendedMovieDecoder);
 var $author$project$Frontend$GotMovies = function (a) {
 	return {$: 2, a: a};
 };
@@ -6237,27 +6257,11 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{aH: $elm$http$Http$emptyBody, _: r._, ac: _List_Nil, aP: 'GET', a_: $elm$core$Maybe$Nothing, ay: $elm$core$Maybe$Nothing, az: r.az});
 };
-var $author$project$Frontend$Movie = F4(
-	function (title, year, imdbID, poster) {
-		return {L: imdbID, G: poster, t: title, U: year};
-	});
-var $elm$json$Json$Decode$map4 = _Json_map4;
-var $author$project$Frontend$movieDecoder = A5(
-	$elm$json$Json$Decode$map4,
-	$author$project$Frontend$Movie,
-	A2($elm$json$Json$Decode$field, 'Title', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'Year', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'imdbID', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'Poster', $elm$json$Json$Decode$string));
-var $author$project$Frontend$moviesDecoder = A2(
-	$elm$json$Json$Decode$field,
-	'Search',
-	$elm$json$Json$Decode$list($author$project$Frontend$movieDecoder));
 var $author$project$Frontend$searchMovies = function (s) {
 	return $elm$http$Http$get(
 		{
 			_: A2($elm$http$Http$expectJson, $author$project$Frontend$GotMovies, $author$project$Frontend$moviesDecoder),
-			az: 'http://localhost:3000/filmeGeral?title=' + (s + '&option=s')
+			az: 'http://localhost:3000/search/movie?title=' + s
 		});
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6265,16 +6269,40 @@ var $author$project$Frontend$translateGenre = function (genre) {
 	switch (genre) {
 		case 'Ação':
 			return 'Action';
-		case 'Drama':
-			return 'Drama';
+		case 'Aventura':
+			return 'Adventure';
+		case 'Animação':
+			return 'Animation';
 		case 'Comédia':
 			return 'Comedy';
+		case 'Crime':
+			return 'Crime';
+		case 'Documentário':
+			return 'Documentary';
+		case 'Drama':
+			return 'Drama';
+		case 'Família':
+			return 'Family';
+		case 'Fantasia':
+			return 'Fantasy';
+		case 'História':
+			return 'History';
 		case 'Terror':
 			return 'Horror';
+		case 'Música':
+			return 'Music';
+		case 'Mistério':
+			return 'Mystery';
 		case 'Romance':
 			return 'Romance';
-		case 'Sci-Fi':
-			return 'Sci-Fi';
+		case 'Ficção Científica':
+			return 'Science Fiction';
+		case 'Thriller':
+			return 'Thriller';
+		case 'Guerra':
+			return 'War';
+		case 'Western':
+			return 'Western';
 		default:
 			return genre;
 	}
@@ -6284,26 +6312,26 @@ var $author$project$Frontend$update = F2(
 		switch (msg.$) {
 			case 0:
 				var g = msg.a;
-				var already = A2($elm$core$List$member, g, model.k);
+				var already = A2($elm$core$List$member, g, model.j);
 				var newList = already ? A2(
 					$elm$core$List$filter,
 					$elm$core$Basics$neq(g),
-					model.k) : (($elm$core$List$length(model.k) < 3) ? A2($elm$core$List$cons, g, model.k) : model.k);
+					model.j) : (($elm$core$List$length(model.j) < 3) ? A2($elm$core$List$cons, g, model.j) : model.j);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{k: newList}),
+						{j: newList}),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				var s = msg.a;
 				return $elm$core$String$isEmpty(s) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{F: _List_Nil, N: s, j: ''}),
+						{B: _List_Nil, N: s, l: ''}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{N: s, j: 'Buscando...'}),
+						{N: s, l: 'Buscando...'}),
 					$author$project$Frontend$searchMovies(s));
 			case 2:
 				if (!msg.a.$) {
@@ -6311,27 +6339,28 @@ var $author$project$Frontend$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{F: ms, j: ''}),
+							{B: ms, l: ''}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{j: 'Erro ao buscar filmes!'}),
+							{l: 'Erro ao buscar filmes!'}),
 						$elm$core$Platform$Cmd$none);
 				}
 			case 3:
 				var movie = msg.a;
-				var isFav = A2($elm$core$Dict$member, movie.L, model.q);
-				var newFavs = isFav ? A2($elm$core$Dict$remove, movie.L, model.q) : A3($elm$core$Dict$insert, movie.L, movie, model.q);
+				var movieId = $author$project$Frontend$getMovieId(movie);
+				var isFav = A2($elm$core$Dict$member, movieId, model.i);
+				var newFavs = isFav ? A2($elm$core$Dict$remove, movieId, model.i) : A3($elm$core$Dict$insert, movieId, movie, model.i);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{q: newFavs}),
+						{i: newFavs}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
-				var favIds = $elm$core$Dict$keys(model.q);
-				var englishGenres = A2($elm$core$List$map, $author$project$Frontend$translateGenre, model.k);
+				var favIds = $elm$core$Dict$keys(model.i);
+				var englishGenres = A2($elm$core$List$map, $author$project$Frontend$translateGenre, model.j);
 				var body = $elm$json$Json$Encode$object(
 					_List_fromArray(
 						[
@@ -6345,11 +6374,11 @@ var $author$project$Frontend$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{A: false, j: 'Enviando...'}),
+						{A: false, l: 'Carregando recomendações...'}),
 					$elm$http$Http$post(
 						{
 							aH: $elm$http$Http$jsonBody(body),
-							_: A2($elm$http$Http$expectJson, $author$project$Frontend$GotRecommended, $author$project$Frontend$recommendedDecoder),
+							_: A2($elm$http$Http$expectJson, $author$project$Frontend$GotRecommended, $author$project$Frontend$moviesDecoder),
 							az: 'http://localhost:3000/recommend/genero/recentes'
 						}));
 			case 5:
@@ -6358,7 +6387,11 @@ var $author$project$Frontend$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{M: movies, j: 'Recomendações carregadas'}),
+							{
+								G: movies,
+								l: '✨ ' + ($elm$core$String$fromInt(
+									$elm$core$List$length(movies)) + ' filmes recomendados carregados!')
+							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = msg.a.a;
@@ -6367,21 +6400,21 @@ var $author$project$Frontend$update = F2(
 							case 0:
 								return 'URL inválida';
 							case 1:
-								return 'Timeout';
+								return 'Timeout - tente novamente';
 							case 2:
-								return 'Erro de rede';
+								return 'Erro de rede - verifique sua conexão';
 							case 3:
 								var code = err.a;
-								return 'Erro ' + $elm$core$String$fromInt(code);
+								return 'Erro do servidor ' + $elm$core$String$fromInt(code);
 							default:
 								var errorBody = err.a;
-								return 'Erro de decodificação: ' + errorBody;
+								return 'Erro de dados: ' + errorBody;
 						}
 					}();
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{j: 'Erro ao carregar recomendações: ' + errorMsg}),
+							{l: '❌ Erro ao carregar recomendações: ' + errorMsg}),
 						$elm$core$Platform$Cmd$none);
 				}
 			case 6:
@@ -6413,10 +6446,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Frontend$ToggleGenre = function (a) {
-	return {$: 0, a: a};
-};
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -6425,9 +6454,13 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			key,
 			$elm$json$Json$Encode$bool(bool));
 	});
-var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Frontend$ToggleGenre = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Basics$not = _Basics_not;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -6447,40 +6480,43 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Frontend$genreCheckbox = F2(
 	function (selected, g) {
 		var isChecked = A2($elm$core$List$member, g, selected);
+		var isDisabled = (!isChecked) && ($elm$core$List$length(selected) >= 3);
+		var checkboxClass = isChecked ? 'bg-blue-500 border-blue-500 text-white' : (isDisabled ? 'bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed' : 'bg-white border-gray-300 hover:border-blue-400 text-gray-700');
 		return A2(
-			$elm$html$Html$div,
+			$elm$html$Html$button,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('flex items-center gap-2')
+					$elm$html$Html$Events$onClick(
+					$author$project$Frontend$ToggleGenre(g)),
+					$elm$html$Html$Attributes$disabled(isDisabled),
+					$elm$html$Html$Attributes$class('px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all ' + checkboxClass)
 				]),
 			_List_fromArray(
 				[
-					A2(
-					$elm$html$Html$input,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('checkbox'),
-							$elm$html$Html$Attributes$checked(isChecked),
-							$elm$html$Html$Events$onClick(
-							$author$project$Frontend$ToggleGenre(g))
-						]),
-					_List_Nil),
-					A2(
-					$elm$html$Html$label,
-					_List_Nil,
-					_List_fromArray(
-						[
-							$elm$html$Html$text(g)
-						]))
+					$elm$html$Html$text(
+					isChecked ? ('✓ ' + g) : g)
 				]));
 	});
 var $author$project$Frontend$genres = _List_fromArray(
-	['Ação', 'Drama', 'Comédia', 'Terror', 'Romance', 'Sci-Fi']);
-var $elm$core$Basics$not = _Basics_not;
+	['Ação', 'Aventura', 'Animação', 'Comédia', 'Crime', 'Documentário', 'Drama', 'Família', 'Fantasia', 'História', 'Terror', 'Música', 'Mistério', 'Romance', 'Ficção Científica', 'Thriller', 'Guerra', 'Western']);
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$core$Dict$isEmpty = function (dict) {
+	if (dict.$ === -2) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -6513,6 +6549,27 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === -2) {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$core$Dict$values = function (dict) {
 	return A3(
 		$elm$core$Dict$foldr,
@@ -6527,6 +6584,7 @@ var $author$project$Frontend$ToggleFavorite = function (a) {
 	return {$: 3, a: a};
 };
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -6539,7 +6597,7 @@ var $author$project$Frontend$viewFavorite = function (movie) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('border rounded shadow p-2 flex flex-col items-center')
+				$elm$html$Html$Attributes$class('bg-white border border-yellow-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow')
 			]),
 		_List_fromArray(
 			[
@@ -6547,42 +6605,63 @@ var $author$project$Frontend$viewFavorite = function (movie) {
 				$elm$html$Html$img,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$src(movie.G),
+						$elm$html$Html$Attributes$src(movie.M),
 						$elm$html$Html$Attributes$alt(movie.t),
-						$elm$html$Html$Attributes$class('w-24 h-32 object-cover rounded mb-2')
+						$elm$html$Html$Attributes$class('w-full h-36 object-cover')
 					]),
 				_List_Nil),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('text-center text-sm font-bold')
+						$elm$html$Html$Attributes$class('p-3')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(movie.t)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('text-xs text-gray-600')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('(' + (movie.U + ')'))
-					])),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick(
-						$author$project$Frontend$ToggleFavorite(movie)),
-						$elm$html$Html$Attributes$class('bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs mt-1')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Remover')
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-sm font-bold mb-1 line-clamp-2')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(movie.t)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-xs text-gray-500 mb-1')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								A2($elm$core$String$left, 4, movie.H))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-xs text-blue-600 mb-2')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								'⭐ ' + $elm$core$String$fromFloat(movie.O))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick(
+								$author$project$Frontend$ToggleFavorite(movie)),
+								$elm$html$Html$Attributes$class('w-full bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('🗑️ Remover')
+							]))
 					]))
 			]));
 };
@@ -6591,7 +6670,7 @@ var $author$project$Frontend$viewMovie = function (movie) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('border rounded shadow p-2 flex flex-col items-center mb-2')
+				$elm$html$Html$Attributes$class('bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow')
 			]),
 		_List_fromArray(
 			[
@@ -6599,52 +6678,72 @@ var $author$project$Frontend$viewMovie = function (movie) {
 				$elm$html$Html$img,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$src(movie.G),
+						$elm$html$Html$Attributes$src(movie.M),
 						$elm$html$Html$Attributes$alt(movie.t),
-						$elm$html$Html$Attributes$class('w-24 h-32 object-cover rounded mb-2')
+						$elm$html$Html$Attributes$class('w-full h-36 object-cover')
 					]),
 				_List_Nil),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('text-center text-sm font-bold')
+						$elm$html$Html$Attributes$class('p-3')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(movie.t)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('text-xs text-gray-600 mb-1')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('(' + (movie.U + ')'))
-					])),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick(
-						$author$project$Frontend$ToggleFavorite(movie)),
-						$elm$html$Html$Attributes$class('bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Favoritar')
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-sm font-bold mb-1 line-clamp-2')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(movie.t)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-xs text-gray-500 mb-1')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								A2($elm$core$String$left, 4, movie.H))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-xs text-blue-600 mb-2')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								'⭐ ' + $elm$core$String$fromFloat(movie.O))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick(
+								$author$project$Frontend$ToggleFavorite(movie)),
+								$elm$html$Html$Attributes$class('w-full bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-medium transition-colors')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('⭐ Favoritar')
+							]))
 					]))
 			]));
 };
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Frontend$viewRecommendedMovie = function (movie) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('border rounded shadow p-2 flex flex-col items-center')
+				$elm$html$Html$Attributes$class('bg-white border border-green-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow')
 			]),
 		_List_fromArray(
 			[
@@ -6652,52 +6751,62 @@ var $author$project$Frontend$viewRecommendedMovie = function (movie) {
 				$elm$html$Html$img,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$src(movie.G),
+						$elm$html$Html$Attributes$src(movie.M),
 						$elm$html$Html$Attributes$alt(movie.t),
-						$elm$html$Html$Attributes$class('w-24 h-32 object-cover rounded mb-2')
+						$elm$html$Html$Attributes$class('w-full h-36 object-cover')
 					]),
 				_List_Nil),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('text-center text-sm font-bold')
+						$elm$html$Html$Attributes$class('p-3')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(movie.t)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('text-xs text-gray-600 mb-1')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(movie.ap)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('text-xs text-blue-600 mb-1')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'⭐ ' + $elm$core$String$fromFloat(movie.aB))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('text-xs text-green-600')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						A2($elm$core$String$join, ', ', movie.ab))
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-sm font-bold mb-1 line-clamp-2')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(movie.t)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-xs text-gray-500 mb-1')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								A2($elm$core$String$left, 4, movie.H))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-xs text-blue-600 mb-1 font-medium')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								'⭐ ' + $elm$core$String$fromFloat(movie.O))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-xs text-green-600 line-clamp-2')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								A2($elm$core$String$join, ' • ', movie.ab))
+							]))
 					]))
 			]));
 };
@@ -6706,26 +6815,15 @@ var $author$project$Frontend$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('p-8 max-w-3xl mx-auto relative')
+				$elm$html$Html$Attributes$class('min-h-screen bg-gray-50')
 			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Frontend$OpenModal),
-						$elm$html$Html$Attributes$class('fixed top-4 right-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded z-50')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Abrir Busca')
-					])),
-				model.A ? A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start pt-8 z-40')
+						$elm$html$Html$Attributes$class('fixed top-0 left-0 right-0 bg-white shadow-md z-50 p-4')
 					]),
 				_List_fromArray(
 					[
@@ -6733,118 +6831,328 @@ var $author$project$Frontend$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('bg-white p-8 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto')
+								$elm$html$Html$Attributes$class('max-w-6xl mx-auto flex justify-between items-center')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$button,
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Frontend$CloseModal),
-										$elm$html$Html$Attributes$class(' hover:text-gray text-black font-bold px-3 py-1 rounded shadow')
+										$elm$html$Html$Attributes$class('text-2xl font-bold text-blue-600')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('X')
+										$elm$html$Html$text('Movie Recomedd')
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('mb-1 font-bold')
+										$elm$html$Html$Attributes$class('flex gap-4 items-center')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Escolha até 3 gêneros:')
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('text-sm text-gray-600')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												'Favoritos: ' + $elm$core$String$fromInt(
+													$elm$core$Dict$size(model.i)))
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Events$onClick($author$project$Frontend$OpenModal),
+												$elm$html$Html$Attributes$class('bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('🔍 Buscar Filmes')
+											]))
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pt-24 pb-8 px-4 max-w-6xl mx-auto')
+					]),
+				_List_fromArray(
+					[
+						(!$elm$core$String$isEmpty(model.l)) ? A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(model.l)
+							])) : $elm$html$Html$text(''),
+						model.A ? A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('bg-white p-6 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto mx-4')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('flex justify-between items-center mb-4 border-b pb-4')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('text-xl font-bold')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Configurar Preferências')
+													])),
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Events$onClick($author$project$Frontend$CloseModal),
+														$elm$html$Html$Attributes$class('text-gray-500 hover:text-gray-700 text-2xl font-bold px-3 py-1 rounded')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('×')
+													]))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mb-6')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mb-3 font-bold text-lg')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('📽️ Escolha até 3 gêneros favoritos:')
+													])),
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3')
+													]),
+												A2(
+													$elm$core$List$map,
+													$author$project$Frontend$genreCheckbox(model.j),
+													$author$project$Frontend$genres))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mb-4')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mb-3 font-bold text-lg')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('🎭 Adicionar filmes favoritos:')
+													])),
+												A2(
+												$elm$html$Html$input,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$type_('text'),
+														$elm$html$Html$Attributes$placeholder('Digite o nome do filme...'),
+														$elm$html$Html$Events$onInput($author$project$Frontend$UpdateSearch),
+														$elm$html$Html$Attributes$class('border border-gray-300 px-4 py-2 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500')
+													]),
+												_List_Nil)
+											])),
+										(!$elm$core$List$isEmpty(model.B)) ? A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mb-6')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('mb-3 font-semibold')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Resultados da busca:')
+													])),
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-80 overflow-y-auto')
+													]),
+												A2($elm$core$List$map, $author$project$Frontend$viewMovie, model.B))
+											])) : $elm$html$Html$text(''),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('text-center pt-4 border-t')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Events$onClick($author$project$Frontend$SendAll),
+														$elm$html$Html$Attributes$class('bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-bold text-lg transition-colors'),
+														$elm$html$Html$Attributes$disabled(
+														$elm$core$List$isEmpty(model.j) && $elm$core$Dict$isEmpty(model.i))
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Gerar Recomendações')
+													]))
+											]))
+									]))
+							])) : $elm$html$Html$text(''),
+						(!$elm$core$Dict$isEmpty(model.i)) ? A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('mb-8')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('mb-4 text-xl font-bold text-gray-800')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('⭐ Seus Filmes Favoritos')
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('mb-1 flex flex-wrap gap-4')
+										$elm$html$Html$Attributes$class('grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4')
 									]),
 								A2(
 									$elm$core$List$map,
-									$author$project$Frontend$genreCheckbox(model.k),
-									$author$project$Frontend$genres)),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('text'),
-										$elm$html$Html$Attributes$placeholder('Digite o título do filme'),
-										$elm$html$Html$Events$onInput($author$project$Frontend$UpdateSearch),
-										$elm$html$Html$Attributes$class('border px-2 py-1 w-full mb-2')
-									]),
-								_List_Nil),
+									$author$project$Frontend$viewFavorite,
+									$elm$core$Dict$values(model.i)))
+							])) : $elm$html$Html$text(''),
+						(!$elm$core$List$isEmpty(model.G)) ? A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('mt-1 h-80 overflow-y-auto')
+										$elm$html$Html$Attributes$class('mb-4 text-xl font-bold text-gray-800')
 									]),
-								A2($elm$core$List$map, $author$project$Frontend$viewMovie, model.F)),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('🎯 Filmes Recomendados Para Você')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4')
+									]),
+								A2($elm$core$List$map, $author$project$Frontend$viewRecommendedMovie, model.G))
+							])) : (($elm$core$Dict$isEmpty(model.i) && $elm$core$List$isEmpty(model.j)) ? A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-center py-16')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('text-6xl mb-4')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('🎬')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('text-xl text-gray-600 mb-4')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Bem-vindo ao Movie Recommed!')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('text-gray-500 mb-6')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Clique em \'Buscar Filmes\' para começar a adicionar seus favoritos')
+									])),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$Frontend$SendAll),
-										$elm$html$Html$Attributes$class('bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mt-2')
+										$elm$html$Html$Events$onClick($author$project$Frontend$OpenModal),
+										$elm$html$Html$Attributes$class('bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Enviar favoritos e gêneros')
+										$elm$html$Html$text('Começar')
 									]))
-							]))
-					])) : $elm$html$Html$text(''),
-				(!$elm$core$String$isEmpty(model.j)) ? A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-4 p-3 bg-blue-100 border border-blue-300 rounded')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(model.j)
-					])) : $elm$html$Html$text(''),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-4 mt-4 font-bold text-lg')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Favoritos:')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('grid grid-cols-4 gap-4 mt-2')
-					]),
-				A2(
-					$elm$core$List$map,
-					$author$project$Frontend$viewFavorite,
-					$elm$core$Dict$values(model.q))),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-4 mt-4 font-bold text-lg')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Recomendações Baseados nos Gêneros que você gosta:')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('grid grid-cols-4 gap-4 mt-2')
-					]),
-				A2($elm$core$List$map, $author$project$Frontend$viewRecommendedMovie, model.M))
+							])) : $elm$html$Html$text(''))
+					]))
 			]));
 };
 var $author$project$Frontend$main = $elm$browser$Browser$element(

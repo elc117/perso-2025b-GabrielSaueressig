@@ -2,7 +2,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 
-
 import Web.Scotty
 import Control.Monad.IO.Class (liftIO)
 import Network.Wai.Middleware.Cors
@@ -12,35 +11,35 @@ import qualified Data.Text as T
 import Network.HTTP.Req
 import qualified Data.Text.Lazy as TL
 import GHC.Generics
-import Data.List (nub, sortOn)
+import Data.List (nub, sortOn, nubBy)
 import Data.Maybe (fromMaybe)
 import qualified Data.Aeson.KeyMap as KM
 import System.Random (randomRIO)
 import Data.Ord (Down(..))
 
--- Função para buscar filmes
-getFilmes :: String -> T.Text -> IO Value
-getFilmes nome option = runReq defaultHttpConfig $ do
-    let opts = option =: nome <> "apikey" =: ("ae725e23" :: String)
-    r <- req GET (http "www.omdbapi.com") NoReqBody jsonResponse opts
-    pure (responseBody r :: Value)
+
+-- API Key do TMDB
+tmdbApiKey :: T.Text
+tmdbApiKey = "062ee31d45a5eee7e0386f738a396a18"
 
 data Generos = Generos
-  { favoritos :: [String]
-  , generos   :: [String]
+  { favoritos :: [String]  -- IMDB IDs dos filmes favoritos
+  , generos   :: [String]  -- Gêneros escolhidos pelo usuário
   } deriving (Show, Generic)
 
 instance FromJSON Generos
 instance ToJSON Generos
 
+-- Novo tipo Movie para incluir IMDB ID (vem do TMDB)
 data Movie = Movie
   { title      :: T.Text
   , releaseDate :: T.Text
   , voteAverage :: Double
   , genres :: [T.Text]
   , poster :: T.Text
-  , genreIds :: [Int]  -- IDs dos gêneros do TMDB
-  }deriving (Show, Generic)
+  , genreIds :: [Int]
+  , imdbId :: Maybe T.Text  -- IMDB ID do TMDB
+  } deriving (Show, Generic)
 
 instance ToJSON Movie where
   toJSON Movie{..} = object
@@ -49,17 +48,19 @@ instance ToJSON Movie where
     , "voteAverage" .= voteAverage
     , "genres" .= genres
     , "poster" .= poster
+    , "imdbId" .= imdbId
     ]
 
--- Removendo o FromJSON personalizado já que não precisamos mais
 instance FromJSON Movie where
   parseJSON = withObject "Movie" $ \o -> do
     title       <- o .: "title"
     releaseDate <- o .: "release_date"
     voteAverage <- o .: "vote_average"
-    genreIds    <- o .: "genre_ids"  -- TMDB retorna array de IDs
-    let genres = map tmdbIdToGenre genreIds  -- Converter IDs para nomes
-        poster = ""
+    genreIds    <- o .: "genre_ids"
+    posterPath  <- o .:? "poster_path" .!= ""
+    imdbId      <- o .:? "imdb_id"  -- Pode não vir na busca
+    let genres = map tmdbIdToGenre genreIds
+        poster = construirUrlPoster posterPath
     return Movie {..}
 
 data DiscoverResp = DiscoverResp
@@ -70,24 +71,21 @@ instance FromJSON DiscoverResp where
     parseJSON = withObject "DiscoverResp" $ \o ->
         DiscoverResp <$> o .: "results"
 
--- Função para buscar poster via OMDB
-buscarPoster :: T.Text -> IO T.Text
-buscarPoster titulo = do
-    filme <- getFilmes (T.unpack titulo) "t"
-    case filme of
-        Object o -> case KM.lookup "Poster" o of
-            Just (String posterUrl) -> 
-                if posterUrl == "N/A" 
-                then return "https://placehold.co/300x450/cccccc/666666?text=No+Poster"
-                else return posterUrl
-            _ -> return "https://placehold.co/300x450/cccccc/666666?text=No+Poster"
-        _ -> return "https://placehold.co/300x450/cccccc/666666?text=No+Poster"
+-- Resposta do endpoint /find (para buscar por IMDB ID)
+data FindResp = FindResp
+  { movieResults :: [Movie]
+  } deriving Show
 
--- Função para adicionar poster a um filme
-adicionarPoster :: Movie -> IO Movie
-adicionarPoster filme = do
-    posterUrl <- buscarPoster (title filme)
-    return filme { poster = posterUrl }
+instance FromJSON FindResp where
+    parseJSON = withObject "FindResp" $ \o ->
+        FindResp <$> o .: "movie_results"
+
+-- Construir URL completa do poster TMDB
+construirUrlPoster :: T.Text -> T.Text
+construirUrlPoster posterPath = 
+    if T.null posterPath 
+    then "https://placehold.co/300x450/cccccc/666666?text=No+Poster"
+    else "https://image.tmdb.org/t/p/w500" <> posterPath
 
 -- Política de CORS
 policy :: CorsResourcePolicy
@@ -112,7 +110,7 @@ tmdbIdToGenre genreId = case genreId of
     27 -> "Horror"
     10402 -> "Music"
     9648 -> "Mystery"
-    10749 -> "Romance"
+    10749 -> "Romance"  -- Agora funcionará corretamente!
     878 -> "Science Fiction"
     10770 -> "TV Movie"
     53 -> "Thriller"
@@ -120,39 +118,7 @@ tmdbIdToGenre genreId = case genreId of
     37 -> "Western"
     _ -> "Unknown"
 
--- Função para buscar filmes de várias páginas aleatórias
-getFilmesRecentes :: T.Text -> IO [Movie]
-getFilmesRecentes apiKey = do
-  -- Gerar 4 páginas aleatórias entre diferentes faixas
-  pagina1 <- randomRIO (1, 5)   -- Páginas iniciais (mais populares)
-  pagina2 <- randomRIO (6, 15)  -- Páginas médias  
-  pagina3 <- randomRIO (16, 25) -- Páginas mais distantes
-  pagina4 <- randomRIO (26, 35) -- Páginas bem distantes
-  
-  -- Buscar filmes de diferentes critérios também
-  filmes1 <- buscarPorCritério apiKey "popularity.desc" pagina1
-  filmes2 <- buscarPorCritério apiKey "vote_average.desc" pagina2  -- Por nota
-  filmes3 <- buscarPorCritério apiKey "release_date.desc" pagina3  -- Mais recentes
-  filmes4 <- buscarPorCritério apiKey "popularity.desc" pagina4
-  
-  return (filmes1 ++ filmes2 ++ filmes3 ++ filmes4)
-
-buscarPorCritério :: T.Text -> T.Text -> Int -> IO [Movie]
-buscarPorCritério apiKey sortBy pageNum = runReq defaultHttpConfig $ do
-  let opts =
-        "api_key"        =: apiKey <>
-        "sort_by"        =: sortBy <>
-        "primary_release_date.gte" =: ("2020-01-01" :: T.Text) <>
-        "vote_average.gte" =: ("5.0" :: T.Text) <>
-        "page"           =: pageNum <>
-        "language"       =: ("en-US" :: T.Text)
-  
-  r <- req GET (https "api.themoviedb.org" /: "3" /: "discover" /: "movie")
-               NoReqBody jsonResponse opts
-  let body = responseBody r :: DiscoverResp
-  pure (results body)
-
--- Mapear gêneros para IDs do TMDB
+-- Mapear nomes de gêneros para IDs do TMDB (agora será usada!)
 genreToTMDBId :: T.Text -> T.Text
 genreToTMDBId genre = case T.toLower genre of
     "action" -> "28"
@@ -168,7 +134,7 @@ genreToTMDBId genre = case T.toLower genre of
     "horror" -> "27"
     "music" -> "10402"
     "mystery" -> "9648"
-    "romance" -> "10749"
+    "romance" -> "10749"  -- Agora mapeado corretamente!
     "science fiction" -> "878"
     "sci-fi" -> "878"
     "tv movie" -> "10770"
@@ -177,38 +143,169 @@ genreToTMDBId genre = case T.toLower genre of
     "western" -> "37"
     _ -> ""
 
--- Calcula a "pontuação" de compatibilidade com os gêneros preferidos
-pontuarFilme :: [T.Text] -> Movie -> Int
+-- Buscar filme por IMDB ID usando TMDB
+buscarFilmePorImdbId :: T.Text -> IO (Maybe Movie)
+buscarFilmePorImdbId imdbId = runReq defaultHttpConfig $ do
+    let opts = "api_key" =: tmdbApiKey <>
+               "external_source" =: ("imdb_id" :: T.Text)
+    
+    r <- req GET (https "api.themoviedb.org" /: "3" /: "find" /: imdbId)
+             NoReqBody jsonResponse opts
+    
+    let body = responseBody r :: FindResp
+        filmes = movieResults body
+    
+    return $ case filmes of
+        (filme:_) -> Just filme
+        [] -> Nothing
+
+-- Buscar gêneros dos filmes favoritos usando TMDB
+buscaGenerosFavoritos :: [String] -> IO [[T.Text]]
+buscaGenerosFavoritos imdbIds = do
+    filmes <- mapM (buscarFilmePorImdbId . T.pack) imdbIds
+    return $ map (maybe [] genres) filmes
+
+-- Estratégia inteligente e escalável para qualquer número de gêneros
+getFilmesRecomendados :: [T.Text] -> IO [Movie]
+getFilmesRecomendados generosPreferidos = do
+    let genreIds = filter (not . T.null) $ map genreToTMDBId generosPreferidos
+    
+    if null genreIds
+    then getFilmesRecentes
+    else do
+
+        filmesAmplos <- buscarFilmesAmplos genreIds
+        
+        -- Ordena por score de compatibilidade
+        let filmesComScore = map (\filme -> (filme, pontuarFilme generosPreferidos filme)) filmesAmplos
+            filmesOrdenados = map fst $ sortOn (Down . snd) filmesComScore
+            melhoresFilmes = take 60 filmesOrdenados
+        
+        return melhoresFilmes
+
+-- Busca ampla usando OR em vez de AND (mais eficaz)
+buscarFilmesAmplos :: [T.Text] -> IO [Movie]
+buscarFilmesAmplos genreIds = do
+    -- Busca filmes que tenham QUALQUER dos gêneros (OR logic)
+    let chunksGeneros = chunksOf 5 genreIds  -- TMDB aceita até ~5 gêneros por request
+    
+    todosFilmes <- mapM buscarChunkGeneros chunksGeneros
+    
+    -- Remove duplicatas por título
+    let filmesUnicos = nubBy (\a b -> title a == title b) (concat todosFilmes)
+    
+    return filmesUnicos
+
+-- Divide lista em chunks de tamanho específico
+chunksOf :: Int -> [a] -> [[a]]
+chunksOf _ [] = []
+chunksOf n xs = take n xs : chunksOf n (drop n xs)
+
+-- Busca um grupo de gêneros usando OR
+buscarChunkGeneros :: [T.Text] -> IO [Movie]
+buscarChunkGeneros genreIds = runReq defaultHttpConfig $ do
+    let genreString = T.intercalate "|" genreIds  -- | = OR no TMDB
+        opts = "api_key" =: tmdbApiKey <>
+               "with_genres" =: genreString <>
+               "sort_by" =: ("popularity.desc" :: T.Text) <>
+               "page" =: (1 :: Int) <>
+               "vote_average.gte" =: ("6.0" :: T.Text) <>
+               "language" =: ("en-US" :: T.Text)
+    
+    liftIO $ putStrLn $ "Buscando gêneros: " ++ T.unpack genreString
+    
+    r <- req GET (https "api.themoviedb.org" /: "3" /: "discover" /: "movie")
+                 NoReqBody jsonResponse opts
+    
+    let body = responseBody r :: DiscoverResp
+        resultados = results body
+    
+    pure resultados
+
+-- Buscar filmes de várias páginas aleatórias (versão original)
+getFilmesRecentes :: IO [Movie]
+getFilmesRecentes = do
+    pagina1 <- randomRIO (1, 5) 
+    pagina2 <- randomRIO (6, 15)   
+    pagina3 <- randomRIO (16, 25)
+    pagina4 <- randomRIO (26, 35) 
+    
+    filmes1 <- buscarPorCritério "popularity.desc" pagina1
+    filmes2 <- buscarPorCritério "popularity.desc" pagina2
+    filmes3 <- buscarPorCritério "popularity.desc" pagina3
+    filmes4 <- buscarPorCritério "popularity.desc" pagina4
+    
+    return (filmes1 ++ filmes2 ++ filmes3 ++ filmes4)
+
+-- Buscar por critério geral
+buscarPorCritério :: T.Text -> Int -> IO [Movie]
+buscarPorCritério sortBy pageNum = runReq defaultHttpConfig $ do
+    let opts =
+          "api_key"        =: tmdbApiKey <>
+          "sort_by"        =: sortBy <>
+          "primary_release_date.gte" =: ("1995-01-01" :: T.Text) <>
+          "vote_average.gte" =: ("7.0" :: T.Text) <>
+          "page"           =: pageNum <>
+          "language"       =: ("en-US" :: T.Text)
+    
+    r <- req GET (https "api.themoviedb.org" /: "3" /: "discover" /: "movie")
+                 NoReqBody jsonResponse opts
+    let body = responseBody r :: DiscoverResp
+    pure (results body)
+
+-- Estrutura para resposta de busca do TMDB
+data SearchResp = SearchResp
+  { searchResults :: [Movie]
+  } deriving Show
+
+instance FromJSON SearchResp where
+    parseJSON = withObject "SearchResp" $ \o ->
+        SearchResp <$> o .: "results"
+
+-- Buscar filmes por título usando TMDB
+buscarFilmesPorTitulo :: T.Text -> IO [Movie]
+buscarFilmesPorTitulo titulo = runReq defaultHttpConfig $ do
+    let opts = "api_key" =: tmdbApiKey <>
+               "query" =: titulo <>
+               "language" =: ("en-US" :: T.Text)
+    
+    r <- req GET (https "api.themoviedb.org" /: "3" /: "search" /: "movie")
+             NoReqBody jsonResponse opts
+    
+    let body = responseBody r :: SearchResp
+    return (searchResults body)
+
+-- Pontuação
+pontuarFilme :: [T.Text] -> Movie -> Double
 pontuarFilme generosPreferidos filme =
     let generosFilme = genres filme
         matches = filter (`elem` generosPreferidos) generosFilme
-        -- Bonus por ter mais gêneros em comum
-        scoreBase = length matches
-        -- Bonus extra se tiver muitos gêneros em comum
-        bonusMultiplo = if scoreBase >= 2 then scoreBase * 2 else scoreBase
-    in bonusMultiplo
-
--- Extrai gêneros de um JSON de filme
-extraiGeneros :: Value -> [T.Text]
-extraiGeneros (Object o) =
-    case KM.lookup "Genre" o of
-        Just (String s) -> map T.strip $ T.splitOn "," s
-        _ -> []
-extraiGeneros _ = []
-
--- Busca gêneros de todos os favoritos
-buscaGenerosFavoritos :: [String] -> IO [[T.Text]]
-buscaGenerosFavoritos ids = mapM (\idText -> do
-    val <- getFilmes idText "i" 
-    return $ extraiGeneros val
-    ) ids
+        numMatches = length matches
+        totalPreferidos = length generosPreferidos
+        
+        -- Porcentagem de compatibilidade
+        compatibilidade = fromIntegral numMatches / fromIntegral totalPreferidos
+        
+        scoreGeneros = compatibilidade ** 1.5
+        
+        -- Bonus extra para alta compatibilidade
+        bonusCompatibilidade = if compatibilidade >= 0.5  -- 50% ou mais dos gêneros
+                              then compatibilidade * 3.0
+                              else 0.0
+        
+        -- Penalty para filmes sem nenhum gênero preferido
+        penalidade = if numMatches == 0 then -20.0 else 0.0
+        
+        scoreTotal = scoreGeneros + bonusCompatibilidade + penalidade
+        
+    in max 0.0 scoreTotal  -- Score nunca negativo
 
 -- Junta gêneros escolhidos com favoritos e remove duplicados
 geraGenerosTotais :: Generos -> IO [T.Text]
 geraGenerosTotais g = do
     let escolhidos = map T.pack (generos g)
     generosFav <- buscaGenerosFavoritos (favoritos g)
-    return $ nub (escolhidos ++ (concat generosFav))
+    return $ nub (escolhidos ++ concat generosFav)
 
 -- Servidor
 main :: IO ()
@@ -217,32 +314,26 @@ main = scotty 3000 $ do
 
     -- Endpoint /hello
     get "/hello" $
-        json $ object ["message" .= ("Hello, backend em Haskell!" :: T.Text)]
+        json $ object ["message" .= ("Hello, backend em Haskell com TMDB!" :: T.Text)]
 
-    -- Endpoint /filmeGeral
-    get "/filmeGeral" $ do
-        title  <- Web.Scotty.queryParam "title"   -- :: ActionM (Maybe TL.Text)
-        option <- Web.Scotty.queryParam "option"  -- :: ActionM (Maybe TL.Text)
+    -- Endpoint para buscar filmes por título 
+    get "/search/movie" $ do
+        titulo <- Web.Scotty.queryParam "title"
+        filmes <- liftIO $ buscarFilmesPorTitulo titulo
+        json filmes
 
-        filme <- liftIO $ getFilmes title option
-        json filme
-
-    -- Endpoint /generos - Sistema de recomendação por gêneros
+    -- Endpoint /generos - Sistema de recomendação melhorado
     post "/recommend/genero/recentes" $ do
         genero <- jsonData :: ActionM Generos
         generosTotais <- liftIO $ geraGenerosTotais genero
-        liftIO $ print ("Gêneros para recomendação:", generosTotais)
+        liftIO $ print ("Gêneros totais:", generosTotais)
         
-        -- 1. Buscar filmes aleatórios de várias páginas do TMDB
-        filmesRecentes <- liftIO $ getFilmesRecentes "062ee31d45a5eee7e0386f738a396a18"
+        -- Buscar filmes usando filtros específicos de gênero
+        filmesRecomendados <- liftIO $ getFilmesRecomendados generosTotais
         
-        -- 2. Calcular score e ordenar por compatibilidade
-        let filmesComScore = map (\filme -> (filme, pontuarFilme generosTotais filme)) filmesRecentes
+        -- Calcular score melhorado e ordenar
+        let filmesComScore = map (\filme -> (filme, pontuarFilme generosTotais filme)) filmesRecomendados
             filmesOrdenados = map fst $ sortOn (Down . snd) filmesComScore
-            filmesRecomendados = take 20 filmesOrdenados
+            filmesFinal = take 20 filmesOrdenados
         
-        -- 3. Buscar posters via OMDB
-        liftIO $ putStrLn "Buscando posters..."
-        filmesComPosters <- liftIO $ mapM adicionarPoster filmesRecomendados
-        
-        json filmesComPosters
+        json filmesFinal
