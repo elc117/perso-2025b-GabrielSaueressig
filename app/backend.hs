@@ -110,7 +110,7 @@ tmdbIdToGenre genreId = case genreId of
     27 -> "Horror"
     10402 -> "Music"
     9648 -> "Mystery"
-    10749 -> "Romance"  -- Agora funcionará corretamente!
+    10749 -> "Romance"
     878 -> "Science Fiction"
     10770 -> "TV Movie"
     53 -> "Thriller"
@@ -118,7 +118,7 @@ tmdbIdToGenre genreId = case genreId of
     37 -> "Western"
     _ -> "Unknown"
 
--- Mapear nomes de gêneros para IDs do TMDB (agora será usada!)
+-- Mapear nomes de gêneros para IDs do TMDB
 genreToTMDBId :: T.Text -> T.Text
 genreToTMDBId genre = case T.toLower genre of
     "action" -> "28"
@@ -134,7 +134,7 @@ genreToTMDBId genre = case T.toLower genre of
     "horror" -> "27"
     "music" -> "10402"
     "mystery" -> "9648"
-    "romance" -> "10749"  -- Agora mapeado corretamente!
+    "romance" -> "10749"
     "science fiction" -> "878"
     "sci-fi" -> "878"
     "tv movie" -> "10770"
@@ -165,7 +165,7 @@ buscaGenerosFavoritos imdbIds = do
     filmes <- mapM (buscarFilmePorImdbId . T.pack) imdbIds
     return $ map (maybe [] genres) filmes
 
--- Estratégia inteligente e escalável para qualquer número de gêneros
+-- gerar recomendadados
 getFilmesRecomendados :: [T.Text] -> IO [Movie]
 getFilmesRecomendados generosPreferidos = do
     let genreIds = filter (not . T.null) $ map genreToTMDBId generosPreferidos
@@ -183,11 +183,11 @@ getFilmesRecomendados generosPreferidos = do
         
         return melhoresFilmes
 
--- Busca ampla usando OR em vez de AND (mais eficaz)
+-- Busca ampla usando OR
 buscarFilmesAmplos :: [T.Text] -> IO [Movie]
 buscarFilmesAmplos genreIds = do
-    -- Busca filmes que tenham QUALQUER dos gêneros (OR logic)
-    let chunksGeneros = chunksOf 5 genreIds  -- TMDB aceita até ~5 gêneros por request
+    -- junta cinco generos de cada vez, ja que tmdb so aceita 5
+    let chunksGeneros = chunksOf 5 genreIds 
     
     todosFilmes <- mapM buscarChunkGeneros chunksGeneros
     
@@ -222,7 +222,7 @@ buscarChunkGeneros genreIds = runReq defaultHttpConfig $ do
     
     pure resultados
 
--- Buscar filmes de várias páginas aleatórias (versão original)
+-- Buscar filmes de várias páginas aleatórias
 getFilmesRecentes :: IO [Movie]
 getFilmesRecentes = do
     pagina1 <- randomRIO (1, 5) 
@@ -293,12 +293,12 @@ pontuarFilme generosPreferidos filme =
                               then compatibilidade * 3.0
                               else 0.0
         
-        -- Penalty para filmes sem nenhum gênero preferido
+        -- Penalidade para filmes sem nenhum gênero preferido
         penalidade = if numMatches == 0 then -20.0 else 0.0
         
         scoreTotal = scoreGeneros + bonusCompatibilidade + penalidade
         
-    in max 0.0 scoreTotal  -- Score nunca negativo
+    in scoreTotal
 
 -- Junta gêneros escolhidos com favoritos e remove duplicados
 geraGenerosTotais :: Generos -> IO [T.Text]

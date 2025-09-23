@@ -13,7 +13,7 @@ import String
 
 -- MODELO
 
--- Tipo unificado para filmes (tanto busca quanto recomendações)
+-- Tipo unificado para filmes
 type alias Movie =
     { title : String
     , releaseDate : String
@@ -35,7 +35,7 @@ type alias Model =
     , searchTitle : String
     , movies : List Movie
     , favorites : Dict.Dict String Movie
-    , recommended : List Movie  -- Agora usa o mesmo tipo
+    , recommended : List Movie
     , status : String
     , modalOpen : Bool
     }
@@ -63,7 +63,7 @@ type Msg
     | GotMovies (Result Http.Error (List Movie))
     | ToggleFavorite Movie
     | SendAll
-    | GotRecommended (Result Http.Error (List Movie))  -- Mesmo tipo
+    | GotRecommended (Result Http.Error (List Movie))
     | CloseModal
     | OpenModal
 
@@ -86,7 +86,7 @@ moviesDecoder =
     Decode.list movieDecoder
 
 
--- GÊNEROS POSSÍVEIS (expandidos para incluir todos os do TMDB)
+-- GÊNEROS POSSÍVEIS
 
 genres : List String
 genres =
@@ -112,7 +112,7 @@ translateGenre genre =
         "Terror" -> "Horror"
         "Música" -> "Music"
         "Mistério" -> "Mystery"
-        "Romance" -> "Romance"  -- Agora funcionará perfeitamente!
+        "Romance" -> "Romance"
         "Ficção Científica" -> "Science Fiction"
         "Thriller" -> "Thriller"
         "Guerra" -> "War"
@@ -167,7 +167,7 @@ update msg model =
 
         SendAll ->
             let
-                -- Pegar IDs dos favoritos (IMDB quando disponível, ou título+data)
+                -- Pegar IDs dos favoritos
                 favIds = Dict.keys model.favorites
                 englishGenres = List.map translateGenre model.genresSelected
                 body =
@@ -180,7 +180,7 @@ update msg model =
             , Http.post
                 { url = "http://localhost:3000/recommend/genero/recentes"
                 , body = Http.jsonBody body
-                , expect = Http.expectJson GotRecommended moviesDecoder  -- Mesmo decoder
+                , expect = Http.expectJson GotRecommended moviesDecoder
                 }
             )
 
