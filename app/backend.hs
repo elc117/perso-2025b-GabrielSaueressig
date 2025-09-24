@@ -314,7 +314,7 @@ buscarPorCritério sortBy pageNum = runReq defaultHttpConfig $ do
     pure (results body)
 
 
--- Buscar filmes de várias páginas aleatórias (versão original)
+-- Buscar filmes de várias páginas aleatórias
 getFilmesRecentes :: IO [Movie]
 getFilmesRecentes = do
     pagina1 <- randomRIO (1, 5) 
@@ -329,7 +329,7 @@ getFilmesRecentes = do
     
     return (filmes1 ++ filmes2 ++ filmes3 ++ filmes4)
 
--- Pontuação inteligente que funciona para qualquer número de gêneros
+-- Pontuação que funciona para qualquer número de gêneros
 pontuarFilme :: [T.Text] -> Movie -> Double
 pontuarFilme generosPreferidos filme =
     let generosFilme = genres filme
@@ -374,19 +374,11 @@ main = scotty 3000 $ do
     get "/hello" $
         json $ object ["message" .= ("Hello, backend em Haskell com TMDB!" :: T.Text)]
 
-    -- Endpoint para buscar filmes por título (substituindo OMDB)
+    -- Endpoint para buscar filmes por título
     get "/search/movie" $ do
         titulo <- Web.Scotty.queryParam "title"
         filmes <- liftIO $ buscarFilmesPorTitulo titulo
         json filmes
-    get "/filme/:imdbId" $ do
-        imdbId <- Web.Scotty.pathParam "imdbId"
-        filme <- liftIO $ buscarFilmePorImdbId imdbId
-        case filme of
-            Just f -> json f
-            Nothing -> do
-                status $ toEnum 404
-                json (object ["error" .= ("Filme não encontrado" :: T.Text)])
 
     -- Endpoint /generos - Sistema de recomendação melhorado
     post "/recommend/genero/recentes" $ do
