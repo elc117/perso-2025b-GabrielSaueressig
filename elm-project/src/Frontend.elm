@@ -180,7 +180,7 @@ update msg model =
             , Http.post
                 { url = "http://localhost:3000/recommend/genero/recentes"
                 , body = Http.jsonBody body
-                , expect = Http.expectJson GotRecommended moviesDecoder
+                , expect = Http.expectJson GotRecommended moviesDecoder 
                 }
             )
 
