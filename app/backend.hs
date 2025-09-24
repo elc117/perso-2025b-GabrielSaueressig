@@ -27,7 +27,8 @@ data Generos = Generos
 
 -- Novo tipo Movie para incluir IMDB ID
 data Movie = Movie
-  { title      :: T.Text
+  { 
+    title      :: T.Text
   , releaseDate :: T.Text
   , voteAverage :: Double
   , genres :: [T.Text]
@@ -38,13 +39,19 @@ data Movie = Movie
 
 instance ToJSON Movie where
   toJSON Movie{..} = object
-    [ "title" .= title
+    [ 
+      "title" .= title
     , "releaseDate" .= releaseDate  
     , "voteAverage" .= voteAverage
     , "genres" .= genres
     , "poster" .= poster
     , "imdbId" .= imdbId
     ]
+
+instance FromJSON SearchResp where
+    parseJSON = withObject "SearchResp" $ \o ->
+        SearchResp <$> o .: "results"
+
 
 data DiscoverResp = DiscoverResp
   { 
@@ -170,12 +177,7 @@ buscarFilmePorImdbId imdbId = runReq defaultHttpConfig $ do
         (filme:_) -> Just filme
         [] -> Nothing
 
--- Buscar gêneros dos filmes favoritos usando TMDB
-buscaGenerosFavoritos :: [String] -> IO [[T.Text]]
-buscaGenerosFavoritos favoriteIds = mapM buscarGenerosPorId favoriteIds
-
-
--- pode ser IMDB ID ou título_data
+        -- pode ser IMDB ID ou título_data
 buscarGenerosPorId :: String -> IO [T.Text]
 buscarGenerosPorId favoriteId = do
 
@@ -202,6 +204,26 @@ buscarGenerosPorId favoriteId = do
             [] -> do
                 return []
 
+-- Buscar gêneros dos filmes favoritos usando TMDB
+buscaGenerosFavoritos :: [String] -> IO [[T.Text]]
+buscaGenerosFavoritos favoriteIds = mapM buscarGenerosPorId favoriteIds
+
+-- Buscar filmes por título usando TMDB
+buscarFilmesPorTitulo :: T.Text -> IO [Movie]
+buscarFilmesPorTitulo titulo = runReq defaultHttpConfig $ do
+    let opts = "api_key" =: tmdbApiKey <>
+               "query" =: titulo <>
+               "certification_country" =: ("US" :: T.Text) <>
+               "certification.lte" =: ("R" :: T.Text) <>
+               "include_adult"  =: ("false" :: T.Text) <>
+               "language" =: ("en-US" :: T.Text)
+    
+    r <- req GET (https "api.themoviedb.org" /: "3" /: "search" /: "movie")
+             NoReqBody jsonResponse opts
+    
+    let body = responseBody r :: SearchResp
+    return (searchResults body)
+
 
 getFilmesRecomendados :: [T.Text] -> IO [Movie]
 getFilmesRecomendados generosPreferidos = do
@@ -220,6 +242,22 @@ getFilmesRecomendados generosPreferidos = do
         
         return melhoresFilmes
 
+-- Divide lista em chunks de tamanho específico
+chunksOf :: Int -> [a] -> [[a]]
+chunksOf _ [] = []
+chunksOf n xs = take n xs : chunksOf n (drop n xs)
+
+
+-- Buscar várias páginas aleatórias para cada chunk de gêneros
+buscarMultiplasPaginasChunk :: [T.Text] -> IO [Movie]
+buscarMultiplasPaginasChunk genreIds = do
+    -- Buscar 3-5 páginas aleatórias diferentes
+    numPaginas <- randomRIO (3, 5 :: Int)
+    paginasAleatorias <- sequence $ replicate numPaginas (randomRIO (1, 25 :: Int))
+    
+    resultados <- mapM (buscarChunkGenerosPagina genreIds) paginasAleatorias
+    return (concat resultados)
+
 -- Busca ampla usando OR
 buscarFilmesAmplos :: [T.Text] -> IO [Movie]
 buscarFilmesAmplos genreIds = do
@@ -233,16 +271,6 @@ buscarFilmesAmplos genreIds = do
     let filmesUnicos = nubBy (\a b -> title a == title b) (concat todosFilmes)
     
     return filmesUnicos
-
--- Buscar várias páginas aleatórias para cada chunk de gêneros
-buscarMultiplasPaginasChunk :: [T.Text] -> IO [Movie]
-buscarMultiplasPaginasChunk genreIds = do
-    -- Buscar 3-5 páginas aleatórias diferentes
-    numPaginas <- randomRIO (3, 5 :: Int)
-    paginasAleatorias <- sequence $ replicate numPaginas (randomRIO (1, 25 :: Int))
-    
-    resultados <- mapM (buscarChunkGenerosPagina genreIds) paginasAleatorias
-    return (concat resultados)
 
 -- Buscar chunk de gêneros em página específica
 buscarChunkGenerosPagina :: [T.Text] -> Int -> IO [Movie]
@@ -266,27 +294,7 @@ buscarChunkGenerosPagina genreIds pagina = runReq defaultHttpConfig $ do
     let body = responseBody r :: DiscoverResp
     pure (results body)
 
--- Divide lista em chunks de tamanho específico
-chunksOf :: Int -> [a] -> [[a]]
-chunksOf _ [] = []
-chunksOf n xs = take n xs : chunksOf n (drop n xs)
-
--- Buscar filmes de várias páginas aleatórias (versão original)
-getFilmesRecentes :: IO [Movie]
-getFilmesRecentes = do
-    pagina1 <- randomRIO (1, 5) 
-    pagina2 <- randomRIO (6, 15)   
-    pagina3 <- randomRIO (16, 25)
-    pagina4 <- randomRIO (26, 35) 
-    
-    filmes1 <- buscarPorCritério "popularity.desc" pagina1
-    filmes2 <- buscarPorCritério "popularity.desc" pagina2
-    filmes3 <- buscarPorCritério "popularity.desc" pagina3
-    filmes4 <- buscarPorCritério "popularity.desc" pagina4
-    
-    return (filmes1 ++ filmes2 ++ filmes3 ++ filmes4)
-
--- Buscar por critério geral (função original)
+-- Buscar por critério geral
 buscarPorCritério :: T.Text -> Int -> IO [Movie]
 buscarPorCritério sortBy pageNum = runReq defaultHttpConfig $ do
     let opts =
@@ -305,25 +313,21 @@ buscarPorCritério sortBy pageNum = runReq defaultHttpConfig $ do
     let body = responseBody r :: DiscoverResp
     pure (results body)
 
-instance FromJSON SearchResp where
-    parseJSON = withObject "SearchResp" $ \o ->
-        SearchResp <$> o .: "results"
 
--- Buscar filmes por título usando TMDB
-buscarFilmesPorTitulo :: T.Text -> IO [Movie]
-buscarFilmesPorTitulo titulo = runReq defaultHttpConfig $ do
-    let opts = "api_key" =: tmdbApiKey <>
-               "query" =: titulo <>
-               "certification_country" =: ("US" :: T.Text) <>
-               "certification.lte" =: ("R" :: T.Text) <>
-               "include_adult"  =: ("false" :: T.Text) <>
-               "language" =: ("en-US" :: T.Text)
+-- Buscar filmes de várias páginas aleatórias (versão original)
+getFilmesRecentes :: IO [Movie]
+getFilmesRecentes = do
+    pagina1 <- randomRIO (1, 5) 
+    pagina2 <- randomRIO (6, 15)   
+    pagina3 <- randomRIO (16, 25)
+    pagina4 <- randomRIO (26, 35) 
     
-    r <- req GET (https "api.themoviedb.org" /: "3" /: "search" /: "movie")
-             NoReqBody jsonResponse opts
+    filmes1 <- buscarPorCritério "popularity.desc" pagina1
+    filmes2 <- buscarPorCritério "popularity.desc" pagina2
+    filmes3 <- buscarPorCritério "popularity.desc" pagina3
+    filmes4 <- buscarPorCritério "popularity.desc" pagina4
     
-    let body = responseBody r :: SearchResp
-    return (searchResults body)
+    return (filmes1 ++ filmes2 ++ filmes3 ++ filmes4)
 
 -- Pontuação inteligente que funciona para qualquer número de gêneros
 pontuarFilme :: [T.Text] -> Movie -> Double
