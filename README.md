@@ -6,6 +6,7 @@
 ### Informações Importantes
 
 **Para rodar os testes utilize** - cabal test
+
 **Para rodar o sistema utilize** - cabal run e abra um servidor no arquivo html
 
 # O Começo da Ideia
